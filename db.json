@@ -1,6 +1,75 @@
 {
-  "departments": [],
-  "doctors": [],
-  "shifts": [],
+  "departments": [
+    {
+      "id": 1771326328034,
+      "name": "Cardiology"
+    }
+  ],
+  "doctors": [
+    {
+      "id": 1771326354826,
+      "name": "Ebii",
+      "email": "ebinesardbc28@gmail.com",
+      "gender": "Male",
+      "religion": "Monk",
+      "country": "India",
+      "departmentId": 1771326328034,
+      "weekOffDay": 0,
+      "currentShiftIndex": 0
+    },
+    {
+      "id": 1771326358239,
+      "name": "Ebii",
+      "email": "ebinesardbc28@gmail.com",
+      "gender": "Male",
+      "religion": "Monk",
+      "country": "India",
+      "departmentId": 1771326328034,
+      "weekOffDay": 1,
+      "currentShiftIndex": 0
+    },
+    {
+      "id": 1771326359135,
+      "name": "Ebii",
+      "email": "ebinesardbc28@gmail.com",
+      "gender": "Male",
+      "religion": "Monk",
+      "country": "India",
+      "departmentId": 1771326328034,
+      "weekOffDay": 2,
+      "currentShiftIndex": 0
+    },
+    {
+      "id": 1771326360854,
+      "name": "Ebii",
+      "email": "ebinesardbc28@gmail.com",
+      "gender": "Male",
+      "religion": "Monk",
+      "country": "India",
+      "departmentId": 1771326328034,
+      "weekOffDay": 3,
+      "currentShiftIndex": 0
+    },
+    {
+      "id": 1771326362285,
+      "name": "Ebii",
+      "email": "ebinesardbc28@gmail.com",
+      "gender": "Male",
+      "religion": "Monk",
+      "country": "India",
+      "departmentId": 1771326328034,
+      "weekOffDay": 4,
+      "currentShiftIndex": 0
+    }
+  ],
+  "shifts": [
+    {
+      "id": 1771326463083,
+      "name": "Morning",
+      "order": 0,
+      "startTime": "08:00",
+      "endTime": "04:00"
+    }
+  ],
   "rosters": []
 }

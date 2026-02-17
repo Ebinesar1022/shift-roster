@@ -15,13 +15,20 @@ interface Props {
 }
 
 const DoctorForm = ({ departmentId, refresh }: Props) => {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    gender: "Male",
-    religion: "",
-    country: "",
-  });
+  const [form, setForm] = useState<{
+  name: string;
+  email: string;
+  gender: "Male" | "Female";
+  religion: string;
+  country: string;
+}>({
+  name: "",
+  email: "",
+  gender: "Male",
+  religion: "",
+  country: "",
+});
+
 
   const handleSubmit = async () => {
     const doctor: Doctor = {
@@ -62,7 +69,7 @@ const DoctorForm = ({ departmentId, refresh }: Props) => {
         fullWidth
         margin="normal"
         onChange={(e) =>
-          setForm({ ...form, gender: e.target.value })
+          setForm({ ...form, gender: e.target.value as "Male" | "Female"})
         }
       >
         <MenuItem value="Male">Male</MenuItem>

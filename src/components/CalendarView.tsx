@@ -1,6 +1,10 @@
 import { Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import { Roster } from "../models";
+interface Props {
+  roster: Roster[];
+}
 
-const CalendarView = ({ roster }) => {
+const CalendarView = ({ roster }:Props) => {
   return (
     <Table>
       <TableHead>
