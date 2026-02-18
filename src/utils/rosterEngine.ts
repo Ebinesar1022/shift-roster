@@ -1,75 +1,74 @@
-import { Doctor, Shift, Roster } from "../models";
+import {
+  Doctor,
+  Shift,
+  ShiftAssignment,
+  Roster,
+} from "../models";
+import { rotateShift } from "./shiftRotationHelper";
 
 export const generateMonthlyRoster = (
+  month: number,
+  year: number,
+  departments: number[],
   doctors: Doctor[],
   shifts: Shift[],
-  departmentId: number,
-  month: number,
-  year: number
+  assignments: ShiftAssignment[]
 ): Roster[] => {
   const result: Roster[] = [];
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const deptDoctors = doctors.filter(
-    (d) => d.departmentId === departmentId
-  );
+  departments.forEach((departmentId) => {
+    const deptDoctors = doctors.filter(
+      (d) => d.departmentId === departmentId
+    );
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(year, month, day);
-    const dayOfWeek = date.getDay();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dayOfWeek = date.getDay();
 
-    const assignedToday = new Set<number>();
+      deptDoctors.forEach((doctor) => {
+        const assignedShift = assignments.find(
+          (a) =>
+            a.departmentId === departmentId &&
+            a.doctorId === doctor.id
+        );
 
-    shifts.forEach((shift) => {
-      const availableDoctors = deptDoctors.filter((doc) => {
-        if (doc.weekOffDay === dayOfWeek) return false;
-        if (assignedToday.has(doc.id)) return false;
+        if (!assignedShift) return;
 
-        // Female night restriction
-        if (doc.gender === "Female" && shift.name === "Night")
-          return false;
-
-        return doc.currentShiftIndex === shift.order;
-      });
-
-      // Avoid same weekOff doctors cluster
-      const uniqueWeekOff = new Set<number>();
-
-      availableDoctors.forEach((doc) => {
-        if (!uniqueWeekOff.has(doc.weekOffDay)) {
+        if (doctor.weekOffDay === dayOfWeek) {
           result.push({
             id: Date.now() + Math.random(),
             date: date.toISOString(),
             departmentId,
-            shiftId: shift.id,
-            doctorId: doc.id,
-            status: "WORK",
+            shiftId: null,
+            doctorId: doctor.id,
+            status: "OFF",
           });
 
-          assignedToday.add(doc.id);
-          uniqueWeekOff.add(doc.weekOffDay);
-        }
-      });
-    });
+          doctor.currentShiftIndex = rotateShift(
+            doctor.currentShiftIndex
+          );
 
-    // Assign OFF and rotate
-    deptDoctors.forEach((doc) => {
-      if (doc.weekOffDay === dayOfWeek) {
+          return;
+        }
+
+        const shift = shifts.find(
+          (s) => s.order === doctor.currentShiftIndex
+        );
+
+        if (!shift) return;
+
         result.push({
           id: Date.now() + Math.random(),
           date: date.toISOString(),
           departmentId,
-          shiftId: null,
-          doctorId: doc.id,
-          status: "OFF",
+          shiftId: shift.id,
+          doctorId: doctor.id,
+          status: "WORK",
         });
-
-        // rotate shift after OFF
-        doc.currentShiftIndex =
-          (doc.currentShiftIndex + 1) % shifts.length;
-      }
-    });
-  }
+      });
+    }
+  });
 
   return result;
 };
