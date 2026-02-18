@@ -1,9 +1,13 @@
-import { TextField, Button, Box } from "@mui/material";
 import { useState } from "react";
-import { createItem } from "../services/api";
-import { Shift } from "../models";
+import { TextField, Button, Box } from "@mui/material";
+import { createItem } from "../../services/api";
+import { Shift } from "../../models";
 
-const ShiftForm = ({ refresh }: { refresh: () => void }) => {
+interface Props {
+  onCreated: () => void;
+}
+
+const ShiftForm = ({ onCreated }: Props) => {
   const [form, setForm] = useState({
     name: "",
     order: 0,
@@ -18,25 +22,25 @@ const ShiftForm = ({ refresh }: { refresh: () => void }) => {
     };
 
     await createItem("shifts", shift);
-    refresh();
+    onCreated();
   };
 
   return (
-    <Box>
+    <Box mb={3}>
       <TextField
         label="Shift Name"
-        fullWidth
         margin="normal"
+        fullWidth
         onChange={(e) =>
           setForm({ ...form, name: e.target.value })
         }
       />
 
       <TextField
-        label="Shift Order (0-2)"
+        label="Order (0-Morning,1-Evening,2-Night)"
         type="number"
-        fullWidth
         margin="normal"
+        fullWidth
         onChange={(e) =>
           setForm({ ...form, order: Number(e.target.value) })
         }
@@ -45,8 +49,8 @@ const ShiftForm = ({ refresh }: { refresh: () => void }) => {
       <TextField
         label="Start Time"
         type="time"
-        fullWidth
         margin="normal"
+        fullWidth
         onChange={(e) =>
           setForm({ ...form, startTime: e.target.value })
         }
@@ -55,15 +59,15 @@ const ShiftForm = ({ refresh }: { refresh: () => void }) => {
       <TextField
         label="End Time"
         type="time"
-        fullWidth
         margin="normal"
+        fullWidth
         onChange={(e) =>
           setForm({ ...form, endTime: e.target.value })
         }
       />
 
       <Button variant="contained" onClick={handleSubmit}>
-        Add Shift
+        Create Shift
       </Button>
     </Box>
   );
