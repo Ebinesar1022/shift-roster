@@ -1,11 +1,5 @@
-import {
-  Doctor,
-  Shift,
-  ShiftAssignment,
-  Roster,
-} from "../models";
+import { Doctor, Shift, ShiftAssignment, Roster } from "../models";
 import { rotateShift } from "./shiftRotationHelper";
-
 export const generateMonthlyRoster = (
   month: number,
   year: number,
@@ -19,22 +13,28 @@ export const generateMonthlyRoster = (
 
   departments.forEach((departmentId) => {
     const deptDoctors = doctors.filter(
-      (d) => d.departmentId === departmentId
+      (d) => Number(d.departmentId) === Number(departmentId)
     );
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day);
-      const dayOfWeek = date.getDay();
+    deptDoctors.forEach((doctor) => {
+      const assignedShift = assignments.find(
+        (a) =>
+          Number(a.departmentId) === Number(departmentId) &&
+          Number(a.doctorId) === Number(doctor.id)
+      );
 
-      deptDoctors.forEach((doctor) => {
-        const assignedShift = assignments.find(
-          (a) =>
-            a.departmentId === departmentId &&
-            a.doctorId === doctor.id
-        );
+      if (!assignedShift) return;
 
-        if (!assignedShift) return;
+      // 🔥 Start from manually assigned shift
+      let shiftIndex = shifts.findIndex(
+        (s) => Number(s.id) === Number(assignedShift.shiftId)
+      );
 
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dayOfWeek = date.getDay();
+
+        // ✅ Week Off Day
         if (doctor.weekOffDay === dayOfWeek) {
           result.push({
             id: Date.now() + Math.random(),
@@ -45,18 +45,14 @@ export const generateMonthlyRoster = (
             status: "OFF",
           });
 
-          doctor.currentShiftIndex = rotateShift(
-            doctor.currentShiftIndex
-          );
+          // 🔥 Rotate shift AFTER week off
+          shiftIndex = (shiftIndex + 1) % shifts.length;
 
-          return;
+          continue;
         }
 
-        const shift = shifts.find(
-          (s) => s.order === doctor.currentShiftIndex
-        );
-
-        if (!shift) return;
+        // ✅ Working Day
+        const shift = shifts[shiftIndex];
 
         result.push({
           id: Date.now() + Math.random(),
@@ -66,9 +62,10 @@ export const generateMonthlyRoster = (
           doctorId: doctor.id,
           status: "WORK",
         });
-      });
-    }
+      }
+    });
   });
 
   return result;
 };
+

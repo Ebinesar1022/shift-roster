@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchAll, createItem } from "../../services/api";
 import { Doctor, ShiftAssignment } from "../../models";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
+import { getWeekDayName } from "../../utils/weekOffManager";
 
 interface Props {
   departmentId: number;
@@ -17,20 +18,22 @@ const AssignDoctorForm = ({ departmentId, shiftId }: Props) => {
     const allDoctors = await fetchAll<Doctor>("doctors");
     const allAssignments = await fetchAll<ShiftAssignment>("shiftAssignments");
 
+    // Filter doctors of selected department
     const deptDoctors = allDoctors.filter(
-      (d) => d.departmentId === departmentId
+      (d) => Number(d.departmentId) === Number(departmentId),
     );
 
-    const alreadyAssignedDoctorIds = allAssignments
-      .filter((a) => a.shiftId === shiftId)
-      .map((a) => a.doctorId);
+    // 🚀 Get ALL assigned doctor IDs (any shift)
+    const alreadyAssignedDoctorIds = allAssignments.map((a) =>
+      Number(a.doctorId),
+    );
 
+    // 🚀 Remove doctors who are already assigned anywhere
     const availableDoctors = deptDoctors.filter(
-      (d) => !alreadyAssignedDoctorIds.includes(d.id)
+      (d) => !alreadyAssignedDoctorIds.includes(Number(d.id)),
     );
 
     setDoctors(availableDoctors);
-    setAssignments(allAssignments);
   };
 
   useEffect(() => {
@@ -42,9 +45,9 @@ const AssignDoctorForm = ({ departmentId, shiftId }: Props) => {
 
     await createItem("shiftAssignments", {
       id: Date.now(),
-      departmentId,
-      shiftId,
-      doctorId: selectedDoctor.id,
+      departmentId: Number(departmentId),
+      shiftId: Number(shiftId),
+      doctorId: Number(selectedDoctor.id),
     });
 
     setSelectedDoctor(null);
@@ -56,7 +59,7 @@ const AssignDoctorForm = ({ departmentId, shiftId }: Props) => {
       <Autocomplete
         options={doctors}
         getOptionLabel={(option) =>
-          `${option.name} (WeekOff: ${option.weekOffDay})`
+          `${option.name} (WeekOff: ${getWeekDayName(option.weekOffDay)})`
         }
         value={selectedDoctor}
         onChange={(_, value) => setSelectedDoctor(value)}
@@ -65,11 +68,7 @@ const AssignDoctorForm = ({ departmentId, shiftId }: Props) => {
         )}
       />
 
-      <Button
-        variant="contained"
-        sx={{ mt: 2 }}
-        onClick={handleAssign}
-      >
+      <Button variant="contained" sx={{ mt: 2 }} onClick={handleAssign}>
         Assign
       </Button>
     </Box>
