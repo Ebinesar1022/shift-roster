@@ -12,6 +12,9 @@ const AssignShiftPage = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [selectedDept, setSelectedDept] = useState<number | null>(null);
   const [shift, setShift] = useState<Shift | null>(null);
+  const selectedDepartment = departments.find(
+    (dept) => dept.id === selectedDept,
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -19,17 +22,15 @@ const AssignShiftPage = () => {
       const shifts = await fetchAll<Shift>("shifts");
 
       setDepartments(dept);
-      setShift(shifts.find((s) => s.id === shiftID) || null);
+      setShift(shifts.find((s) => Number(s.id) === Number(shiftID)) || null);
     };
 
     load();
-  }, []);
+  }, [shiftID]);
 
   return (
     <Box p={4}>
-      <Typography variant="h5">
-        Assign Doctors – {shift?.name}
-      </Typography>
+      <Typography variant="h5">Assign Doctors – {shift?.name}</Typography>
 
       {departments.map((dept) => (
         <Button
@@ -41,12 +42,14 @@ const AssignShiftPage = () => {
           {dept.name}
         </Button>
       ))}
+      {selectedDepartment && (
+        <Typography sx={{ mt: 2 }}>
+          Selected Department: <strong>{selectedDepartment.name}</strong>
+        </Typography>
+      )}
 
       {selectedDept && shift && (
-        <AssignDoctorForm
-          departmentId={selectedDept}
-          shiftId={shiftID}
-        />
+        <AssignDoctorForm departmentId={selectedDept} shiftId={shiftID} />
       )}
     </Box>
   );
