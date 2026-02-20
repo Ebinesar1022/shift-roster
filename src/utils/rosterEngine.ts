@@ -6,29 +6,59 @@ export const generateMonthlyRoster = (
   departments: number[],
   doctors: Doctor[],
   shifts: Shift[],
-  assignments: ShiftAssignment[]
+  assignments: ShiftAssignment[],
+  existingRosters: Roster[],
 ): Roster[] => {
   const result: Roster[] = [];
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   departments.forEach((departmentId) => {
     const deptDoctors = doctors.filter(
-      (d) => Number(d.departmentId) === Number(departmentId)
+      (d) => Number(d.departmentId) === Number(departmentId),
     );
 
     deptDoctors.forEach((doctor) => {
       const assignedShift = assignments.find(
         (a) =>
           Number(a.departmentId) === Number(departmentId) &&
-          Number(a.doctorId) === Number(doctor.id)
+          Number(a.doctorId) === Number(doctor.id),
       );
 
       if (!assignedShift) return;
 
-      // 🔥 Start from manually assigned shift
-      let shiftIndex = shifts.findIndex(
-        (s) => Number(s.id) === Number(assignedShift.shiftId)
-      );
+      // 👇 Check previous month
+      const prevMonth = month === 0 ? 11 : month - 1;
+      const prevYear = month === 0 ? year - 1 : year;
+
+      const prevMonthData = existingRosters
+        .filter(
+          (r) =>
+            r.doctorId === doctor.id &&
+            r.departmentId === departmentId &&
+            r.month === prevMonth &&
+            r.year === prevYear,
+        )
+        .sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        );
+
+      let shiftIndex;
+
+      // If previous month exists
+      if (prevMonthData.length > 0) {
+        const lastDay = prevMonthData[prevMonthData.length - 1];
+
+        if (lastDay.shiftId) {
+          shiftIndex = shifts.findIndex((s) => s.id === lastDay.shiftId);
+        }
+      }
+
+      // If no previous month data → start from assigned shift
+      if (shiftIndex === undefined) {
+        shiftIndex = shifts.findIndex(
+          (s) => Number(s.id) === Number(assignedShift.shiftId),
+        );
+      }
 
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
@@ -38,7 +68,9 @@ export const generateMonthlyRoster = (
         if (doctor.weekOffDay === dayOfWeek) {
           result.push({
             id: Date.now() + Math.random(),
-            date: date.toISOString(),
+            date: `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+            month,
+            year,
             departmentId,
             shiftId: null,
             doctorId: doctor.id,
@@ -56,7 +88,9 @@ export const generateMonthlyRoster = (
 
         result.push({
           id: Date.now() + Math.random(),
-          date: date.toISOString(),
+          date: `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+          month,
+          year,
           departmentId,
           shiftId: shift.id,
           doctorId: doctor.id,
@@ -68,4 +102,3 @@ export const generateMonthlyRoster = (
 
   return result;
 };
-

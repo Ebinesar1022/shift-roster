@@ -25,7 +25,7 @@ const AppRoutes = () => {
           element={<DashboardLayout><AssignShiftPage /></DashboardLayout>}
         />
 
-        <Route path="/roster" element={<RosterPage />} />
+        <Route path="/roster" element={<DashboardLayout><RosterPage /></DashboardLayout>} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

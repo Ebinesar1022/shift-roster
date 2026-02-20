@@ -1,5 +1,6 @@
 import { Box, Button, MenuItem, Select } from "@mui/material";
 import { Department, Shift } from "../../models";
+import { exportRosterToExcel } from "../../utils/exportRosterToExcel";
 interface Props {
   departments: Department[];
   shifts: Shift[];
@@ -9,7 +10,7 @@ interface Props {
   onShiftChange: (value: number | "ALL") => void;
   onGenerate: () => void;
 }
-
+ 
 const RosterFilter = ({
   departments,
   shifts,
@@ -41,16 +42,18 @@ const RosterFilter = ({
         <MenuItem value="ALL">All Shifts</MenuItem>
         {shifts.map((shift) => (
           <MenuItem key={shift.id} value={shift.id}>
-            {shift.name}
+            {shift.name} ({shift.startTime} - {shift.endTime})
           </MenuItem>
         ))}
       </Select>
-
+ 
       <Button variant="contained" onClick={onGenerate}>
         Generate
       </Button>
+ 
+ 
     </Box>
   );
 };
-
+ 
 export default RosterFilter;
