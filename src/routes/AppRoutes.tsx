@@ -6,6 +6,7 @@ import DepartmentDoctorsPage from "../pages/department/DepartmentDoctorsPage";
 import ShiftPage from "../pages/shift/ShiftPage";
 import AssignShiftPage from "../pages/shift/AssignShiftPage";
 import RosterPage from "../pages/roster/RosterPage";
+import FrontDeskPage from "../pages/frontdesk/FrontDeskPage";
 
 const AppRoutes = () => {
   return (
@@ -25,7 +26,8 @@ const AppRoutes = () => {
           element={<DashboardLayout><AssignShiftPage /></DashboardLayout>}
         />
 
-        <Route path="/roster" element={<RosterPage />} />
+        <Route path="/roster" element={<DashboardLayout><RosterPage /></DashboardLayout>} />
+        <Route path="/frontdesk" element={<DashboardLayout><FrontDeskPage /></DashboardLayout>} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
