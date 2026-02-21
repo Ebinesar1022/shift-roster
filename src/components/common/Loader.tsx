@@ -18,7 +18,7 @@ const Loader = () => {
         zIndex: 9999,
       }}
     >
-      <HashLoader color="#eac64e" size={60} />
+      <HashLoader color="#050505" size={60} />
     </Box>
   );
 };
